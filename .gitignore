@@ -1,0 +1,6 @@
+.venv/ 
+__pycache__/ 
+.deepeval/ 
+chroma_store_data/ 
+.env 
+.vscode/ 
