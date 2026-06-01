@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = "==3.11.*"
 dependencies = [
+    "chardet==4.0.0",
     "chromadb>=1.0.0",
     "deepeval>=4.0.0",
     "docarray>=0.41.0",
