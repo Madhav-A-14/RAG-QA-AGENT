@@ -4,11 +4,12 @@ os.environ["CONFIDENT_AI_AUTO_OPEN_BROWSER"] = "NO"
 
 import json
 from rag_agent import RAGAgent 
+import inspect
 
-from deepeval import evaluate as deepeval_evaluate
 from deepeval.test_case import LLMTestCase, SingleTurnParams
-from deepeval.dataset import EvaluationDataset
+from deepeval.dataset import EvaluationDataset,Golden
 from deepeval.synthesizer import Synthesizer
+print(inspect.signature(Synthesizer.generate_goldens_from_docs))
 from deepeval.metrics import(
     ContextualPrecisionMetric,
     ContextualRecallMetric,
@@ -27,37 +28,89 @@ chroma_dir = "chroma_store_" + "_".join([path.replace(".txt", "") for path in do
 agent = RAGAgent(document_paths,chroma_persist_dir=chroma_dir)
 
 
-# ── 2. Generate Goldens (Once) or Pull from Confident AI ─────────────────────
+# ── 2. Manual Golden QA Pairs (25) ───────────────────────────────────────────
 
-DATASET_ALIAS = "RAG QA APPLICATION DATASET"
+manual_goldens = [
+    Golden(input="What is the NanoDrop 3000?",
+           expected_output="The NanoDrop 3000 is Theranos's flagship compact portable diagnostic device capable of performing over 300 blood tests using just 1–2 microliters of capillary blood, delivering lab-grade results in under 20 minutes."),
+    Golden(input="Which third-party health systems does TheraCloud integrate with?",
+           expected_output="TheraCloud integrates with EPIC, Cerner, and Apple Health via HL7 and FHIR protocols."),
+    Golden(input="Does the NanoDrop 3000 have full FDA approval?",
+           expected_output="No. The NanoDrop 3000 is CE-marked and pending full FDA 510(k) clearance. It only received Emergency Use Approval for the COVID-19 MicroDrop Panel in 2021."),
+    Golden(input="What is MicroVial Sensing?",
+           expected_output="MicroVial Sensing (MVS) is Theranos's next-generation detection framework combining nanophotonic arrays and adaptive sample calibration."),
+    Golden(input="When did Theranos complete its Series F and how much was raised?",
+           expected_output="Theranos completed its Series F in Q1 2023, raising $240 million from Fidelity, BlackRock, and Sequoia Capital."),
+    Golden(input="Can anyone use the NanoDrop Home Kit regardless of location?",
+           expected_output="No. The NanoDrop Home Kit is only available in select states with licensed telehealth coverage through the TheraDirect partnership."),
+    Golden(input="Who is responsible for cloud engineering at Theranos?",
+           expected_output="Richard Parker is the VP of Cloud Engineering at Theranos."),
+    Golden(input="Which Theranos partner handles remote care distribution?",
+           expected_output="TelePath Global handles remote care distribution for Theranos."),
+    Golden(input="What is the reproducibility rate of Theranos test results?",
+           expected_output="Theranos test results have a reproducibility rate between 92–97% across sample types and environments."),
+    Golden(input="What is the exact blood sample volume the NanoDrop 3000 uses on average?",
+           expected_output="The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood."),
+]
 
-print("\n" + "=" * 60)
-print("Loading Dataset...")
-print("\n" + "=" * 60)
+   
+# ── 3. Load or Generate Full Golden Dataset ───────────────────────────────────
 
+
+GOLDENS_FILE = "goldens.json"
 dataset = EvaluationDataset()
 
-try:
-    # Checking whether dataset available inorder to pull from Confident AI
-    dataset.pull(alias=DATASET_ALIAS)
-    print(f" Pulled {len(dataset.goldens)} from Confident AI")
-    
-except:
-    # Dataset not available, need to generate and push to Confident AI
-    print(f" Dataset not Found. Generating goldens from Data...")
-    
+if os.path.exists(GOLDENS_FILE):
+    print("\n" + "=" * 60)
+    print("Loading goldens from local JSON file...")
+    print("=" * 60)
+
+    with open(GOLDENS_FILE, "r") as f:
+        data = json.load(f)
+
+    all_goldens = [
+        Golden(input=d["input"], expected_output=d["expected_output"])
+        for d in data
+    ]
+    dataset = EvaluationDataset(goldens=all_goldens)
+    print(f"Loaded {len(all_goldens)} goldens "
+          f"({sum(1 for d in data if d['source'] == 'manual')} manual, "
+          f"{sum(1 for d in data if d['source'] == 'synthesized')} synthesized)")
+
+else:
+    print("\n" + "=" * 60)
+    print("goldens.json not found. Generating synthesized goldens...")
+    print("=" * 60)
+
     synthesizer = Synthesizer()
-    goldens = synthesizer.generate_goldens_from_docs(document_paths = document_paths)
-    
-    print(f" Generated {len(goldens)} goldens.")
-    print("\n Generated QA Pairs")
-    
-    dataset = EvaluationDataset(goldens=goldens)
-    dataset.push(alias=DATASET_ALIAS)
-    print(f"\n Dataset Successfully pushed into Confident AI under alias name ")
+    synthesized_goldens = synthesizer.generate_goldens_from_docs(
+        document_paths=document_paths,
+        max_goldens_per_context=5, # 5 per chunk × 2 chunks ≈ 10 total
+        
+    )
+    print(f"Synthesized {len(synthesized_goldens)} goldens.")
+
+    all_goldens = manual_goldens + synthesized_goldens
+    dataset = EvaluationDataset(goldens=all_goldens)
+
+    goldens_to_save = (
+        [{"input": g.input, "expected_output": g.expected_output, "source": "manual"}
+         for g in manual_goldens]
+        +
+        [{"input": g.input, "expected_output": g.expected_output, "source": "synthesized"}
+         for g in synthesized_goldens]
+    )
+
+    with open(GOLDENS_FILE, "w") as f:
+        json.dump(goldens_to_save, f, indent=2)
+
+    print(f"\nSaved {len(goldens_to_save)} total goldens to {GOLDENS_FILE}")
+    print(f"  Manual:      {len(manual_goldens)}")
+    print(f"  Synthesized: {len(synthesized_goldens)}")
 
 
-# ── 3. Running the Agent and Collecting TestCases ────────────────────
+
+# ── 4. Running the Agent and Collecting TestCases ────────────────────
 
 print("\n" + "=" * 60)
 print("Running RAG on All Goldens Generated...")
@@ -95,7 +148,7 @@ for i, golden in enumerate(dataset.goldens,1):
 print(f"\n✅ All {len(test_cases)} test cases built.\n")
 
 
-# ── 4. Defining Generator and Retriever Metrics ────────────────────
+# ── 5. Defining Generator and Retriever Metrics ────────────────────
 
 # Retriever Metrics
 relevancy = ContextualRelevancyMetric(threshold=0.7,verbose_mode=True)
@@ -137,7 +190,7 @@ citation_accuracy = GEval(
     
 )
 
-# ── 5. Running Evaluations (DeepEval) ────────────────────
+# ── 6. Running Evaluations (DeepEval) ────────────────────
 # print("="*60)
 # print("DEEPEVAL -- EVALUATION METRICS")
 # print("="*60)
@@ -160,7 +213,37 @@ deepeval_metrics = [
     citation_accuracy
 ]
 
-deepeval_evaluate(test_cases, deepeval_metrics) 
+# Measure each metric directly — bypasses Confident AI sync entirely
+results = {
+    "Contextual Relevancy": [],
+    "Contextual Recall": [],
+    "Contextual Precision": [],
+    "Answer Correctness": [],
+    "Citation Accuracy": [],
+}
 
+metric_map = {
+    "Contextual Relevancy": relevancy,
+    "Contextual Recall": recall,
+    "Contextual Precision": precision,
+    "Answer Correctness": answer_correctness,
+    "Citation Accuracy": citation_accuracy,
+}
+
+for i, test_case in enumerate(test_cases, 1):
+    print(f"\nEvaluating test case {i}/{len(test_cases)}...")
+    for name, metric in metric_map.items():
+        metric.measure(test_case)
+        results[name].append(metric.score)
+
+# Print final averaged results
+print("\n" + "=" * 60)
+print("FINAL RESULTS (avg across all test cases)")
+print("=" * 60)
+
+for metric_name, scores in results.items():
+    avg = sum(scores) / len(scores)
+    status = "PASS ✅" if avg >= 0.7 else "FAIL ❌"
+    print(f"{metric_name:<35} {avg:.2f}  {status}")
 
 

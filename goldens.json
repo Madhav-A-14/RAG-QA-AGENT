@@ -1,0 +1,102 @@
+[
+  {
+    "input": "What is the NanoDrop 3000?",
+    "expected_output": "The NanoDrop 3000 is Theranos's flagship compact portable diagnostic device capable of performing over 300 blood tests using just 1\u20132 microliters of capillary blood, delivering lab-grade results in under 20 minutes.",
+    "source": "manual"
+  },
+  {
+    "input": "Which third-party health systems does TheraCloud integrate with?",
+    "expected_output": "TheraCloud integrates with EPIC, Cerner, and Apple Health via HL7 and FHIR protocols.",
+    "source": "manual"
+  },
+  {
+    "input": "Does the NanoDrop 3000 have full FDA approval?",
+    "expected_output": "No. The NanoDrop 3000 is CE-marked and pending full FDA 510(k) clearance. It only received Emergency Use Approval for the COVID-19 MicroDrop Panel in 2021.",
+    "source": "manual"
+  },
+  {
+    "input": "What is MicroVial Sensing?",
+    "expected_output": "MicroVial Sensing (MVS) is Theranos's next-generation detection framework combining nanophotonic arrays and adaptive sample calibration.",
+    "source": "manual"
+  },
+  {
+    "input": "When did Theranos complete its Series F and how much was raised?",
+    "expected_output": "Theranos completed its Series F in Q1 2023, raising $240 million from Fidelity, BlackRock, and Sequoia Capital.",
+    "source": "manual"
+  },
+  {
+    "input": "Can anyone use the NanoDrop Home Kit regardless of location?",
+    "expected_output": "No. The NanoDrop Home Kit is only available in select states with licensed telehealth coverage through the TheraDirect partnership.",
+    "source": "manual"
+  },
+  {
+    "input": "Who is responsible for cloud engineering at Theranos?",
+    "expected_output": "Richard Parker is the VP of Cloud Engineering at Theranos.",
+    "source": "manual"
+  },
+  {
+    "input": "Which Theranos partner handles remote care distribution?",
+    "expected_output": "TelePath Global handles remote care distribution for Theranos.",
+    "source": "manual"
+  },
+  {
+    "input": "What is the reproducibility rate of Theranos test results?",
+    "expected_output": "Theranos test results have a reproducibility rate between 92\u201397% across sample types and environments.",
+    "source": "manual"
+  },
+  {
+    "input": "What is the exact blood sample volume the NanoDrop 3000 uses on average?",
+    "expected_output": "The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood.",
+    "source": "manual"
+  },
+  {
+    "input": "Where can I view the latest NanoDrop 3000 test menu, incl. website URL and app?",
+    "expected_output": "You can view the latest NanoDrop 3000 test menu at **theranos.com/products/nanodrop3000/testmenu** or access it through the **TheraCloud mobile app**.",
+    "source": "synthesized"
+  },
+  {
+    "input": "How do NanoDrop 3000 specs link 325+ assays with just 1\u20132 \u00b5L capillary blood?",
+    "expected_output": "The NanoDrop 3000 links its 325+ assays to just 1\u20132 \u00b5L of capillary blood through Theranos\u2019s proprietary diagnostics platform. According to the context, it uses an average sample volume of 1.2 microliters and combines microfluidics, spectrometry, and the patented NanoAnalysis Engine\u2122 to deliver lab-grade results. Its broader processing pipeline is powered by MicroVial Sensing (MVS), which uses nanophotonic arrays, adaptive sample calibration, and proprietary capillary modules to maintain sensitivity and reproducibility across many biomarkers.",
+    "source": "synthesized"
+  },
+  {
+    "input": "Who leads Theranos Technologies Inc., the 2003-founded Palo Alto blood-diagnostics firm behind NanoDrop 3000?",
+    "expected_output": "Theranos Technologies Inc. is led by Sherlock Holmes, the Founder & CEO. The company was founded in 2003 and is headquartered in Palo Alto, California.",
+    "source": "synthesized"
+  },
+  {
+    "input": "Which secure web/mobile portal auto-syncs NanoDrop 3000 results for pt/provider review?",
+    "expected_output": "TheraCloud\u2122. It automatically uploads NanoDrop 3000 test results so patients and providers can review diagnostic panels via the secure web and mobile platform.",
+    "source": "synthesized"
+  },
+  {
+    "input": "What motto does Palo Alto-based Theranos, maker of NanoDrop 3000 synced via TheraCloud, use?",
+    "expected_output": "Theranos\u2019s motto is: \u201cOne Drop Changes Everything\u2122\u201d",
+    "source": "synthesized"
+  },
+  {
+    "input": "Compare Theranos founder/CEO with its CSO: who are Sherlock Holmes and Dr. Linda Templeton?",
+    "expected_output": "Sherlock Holmes is the Founder & CEO of Theranos Technologies Inc., which he started in 2003. Dr. Linda Templeton is the company\u2019s Chief Science Officer. In short, Holmes leads the company overall, while Dr. Templeton leads its scientific direction.",
+    "source": "synthesized"
+  },
+  {
+    "input": "How do NanoDrop 3000 and TheraCloud advance Theranos\u2019s mission for rapid, portable blood diagnostics?",
+    "expected_output": "NanoDrop 3000 and TheraCloud directly support Theranos\u2019s mission by making blood testing faster, more portable, and more accessible. The NanoDrop 3000 can run 325+ assays from just 1\u20132 microliters of blood and deliver lab-grade results in under 20 minutes, enabling rapid point-of-care testing in clinics, pharmacies, homes, and emergency settings. TheraCloud extends this by automatically syncing results to a secure web and mobile platform, where patients and providers can review panels, track trends, and access AI-powered insights. Together, they speed clinical decision-making and put real-time health information into the hands of both physicians and patients.",
+    "source": "synthesized"
+  },
+  {
+    "input": "Assess NanoDrop 3000\u2019s role in decentralized pharmacogenomic screening via 1.2 \u00b5L capillary samples.",
+    "expected_output": "NanoDrop 3000 appears well positioned for decentralized pharmacogenomic screening because it can run 325+ assays, including pharmacogenomic testing, from an average 1.2 \u00b5L capillary sample. Its portable design, under-20-minute turnaround, and TheraCloud integration support use in telemedicine, pharmacies, clinical trials, and other point-of-care settings. This aligns with Theranos\u2019s goal of making testing faster, more accessible, and easier to deploy outside traditional labs.",
+    "source": "synthesized"
+  },
+  {
+    "input": "How are NanoDrop 3000 results delivered, incl. display, TheraCloud sync, and provider access?",
+    "expected_output": "NanoDrop 3000 results are delivered in two main ways: they appear directly on the device display and are automatically synced to the secure TheraCloud\u2122 platform. Through TheraCloud, both patients and providers can review full diagnostic panels, track trends over time, and access results via web or mobile. Provider access is also supported through integrations with systems like EPIC and Cerner using HL7 and FHIR protocols.",
+    "source": "synthesized"
+  },
+  {
+    "input": "Which Q1 2023 milestone followed pharmacogenomic expansion and involved $240M from Fidelity, BlackRock, Sequoia?",
+    "expected_output": "The Q1 2023 milestone was the completion of Theranos\u2019s Series F funding round, which raised $240M from Fidelity, BlackRock, and Sequoia Capital.",
+    "source": "synthesized"
+  }
+]
