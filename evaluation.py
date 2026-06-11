@@ -141,8 +141,16 @@ class RAGEvaluator:
             )
         )
         print(f"\n✅ All {len(self.test_cases)} test cases built.\n")
+        
+        
+    # ── Step 5: Define Retriever and Generator Metrics ─────────────────────────────────────────────
 
-
+    def _build_metrics(self)->dict:
+        
+        return{
+            "Contextual_Relevancy":ContextualRelevancyMetric(threshold=0.7,verbose_mode=True)
+            
+        }
 
                     
             
