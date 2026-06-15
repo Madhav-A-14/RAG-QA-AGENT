@@ -1,0 +1,42 @@
+[
+  {
+    "input": "What is the NanoDrop 3000?",
+    "expected_output": "The NanoDrop 3000 is Theranos's flagship compact portable diagnostic device capable of performing over 300 blood tests using just 1–2 microliters of capillary blood, delivering lab-grade results in under 20 minutes."
+  },
+  {
+    "input": "Which third-party health systems does TheraCloud integrate with?",
+    "expected_output": "TheraCloud integrates with EPIC, Cerner, and Apple Health via HL7 and FHIR protocols."
+  },
+  {
+    "input": "Does the NanoDrop 3000 have full FDA approval?",
+    "expected_output": "No. The NanoDrop 3000 is CE-marked and pending full FDA 510(k) clearance. It only received Emergency Use Approval for the COVID-19 MicroDrop Panel in 2021."
+  },
+  {
+    "input": "What is MicroVial Sensing?",
+    "expected_output": "MicroVial Sensing (MVS) is Theranos's next-generation detection framework combining nanophotonic arrays and adaptive sample calibration."
+  },
+  {
+    "input": "When did Theranos complete its Series F and how much was raised?",
+    "expected_output": "Theranos completed its Series F in Q1 2023, raising $240 million from Fidelity, BlackRock, and Sequoia Capital."
+  },
+  {
+    "input": "Can anyone use the NanoDrop Home Kit regardless of location?",
+    "expected_output": "No. The NanoDrop Home Kit is only available in select states with licensed telehealth coverage through the TheraDirect partnership."
+  },
+  {
+    "input": "Who is responsible for cloud engineering at Theranos?",
+    "expected_output": "Richard Parker is the VP of Cloud Engineering at Theranos."
+  },
+  {
+    "input": "Which Theranos partner handles remote care distribution?",
+    "expected_output": "TelePath Global handles remote care distribution for Theranos."
+  },
+  {
+    "input": "What is the reproducibility rate of Theranos test results?",
+    "expected_output": "Theranos test results have a reproducibility rate between 92–97% across sample types and environments."
+  },
+  {
+    "input": "What is the exact blood sample volume the NanoDrop 3000 uses on average?",
+    "expected_output": "The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood."
+  }
+]

@@ -95,7 +95,7 @@ class RAGAgent:            #Class Declaration
     
     # Retriever
     
-    def retrieve(self,query:str):
+    def fetch(self,query:str):
         print("Retrieving relevant chunks...")
         docs = self.vector_store.similarity_search(query,k=self.k) # stored as document object
         retrieved_docs = [doc.page_content for doc in docs]
@@ -104,7 +104,7 @@ class RAGAgent:            #Class Declaration
 
     # Generator 
 
-    def generate(
+    def respond(
             self,
             query:str,
             retrieved_docs:list,
@@ -119,15 +119,15 @@ class RAGAgent:            #Class Declaration
         return response.content
     
 
-    def answer(
+    def ask(
             self,
             query:str,
             llm_model = None,
             prompt_template : str = None,
         ):
 
-        retrieved_docs = self.retrieve(query)
-        generated_answer = self.generate(query,retrieved_docs,llm_model,prompt_template)
+        retrieved_docs = self.fetch(query)
+        generated_answer = self.respond(query,retrieved_docs,llm_model,prompt_template)
         
         try:
             res = json.loads(generated_answer)
