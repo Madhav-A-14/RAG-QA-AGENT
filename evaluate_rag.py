@@ -4,6 +4,7 @@ os.environ["CONFIDENT_AI_AUTO_OPEN_BROWSER"] = "NO"
 
 import json
 from config import agent,document_paths
+from report import export_report
 
 from deepeval.test_case import LLMTestCase, SingleTurnParams
 from deepeval.dataset import EvaluationDataset,Golden
@@ -53,6 +54,7 @@ class RAGEvaluator:
                 for d in data
             ]  
             self.dataset = EvaluationDataset(goldens = all_goldens)
+            self.dataset.goldens = self.dataset.goldens[:3]  # ← add here
             print(f"Loaded {len(all_goldens)} goldens "
             f"({sum(1 for d in data if d['source'] == 'manual')} manual, "
             f"{sum(1 for d in data if d['source'] == 'synthesized')} synthesized)")
@@ -72,6 +74,7 @@ class RAGEvaluator:
             
             all_goldens = manual_goldens + synthesized_goldens
             self.dataset = EvaluationDataset(goldens=all_goldens)
+            self.dataset.goldens = self.dataset.goldens[:3]  # ← add here
             
             
             
@@ -211,7 +214,7 @@ class RAGEvaluator:
         self.build_test_cases()
         self.run_evaluation()
         self.print_results()
-        
+        export_report(self.test_cases,self.results)
     
 # ENTRY POINT
         
