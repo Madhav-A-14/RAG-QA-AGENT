@@ -38,5 +38,31 @@
   {
     "input": "What is the exact blood sample volume the NanoDrop 3000 uses on average?",
     "expected_output": "The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood."
+  },
+  {
+    "input": "Can anyone use the NanoDrop Home Kit regardless of location?",
+    "expected_output": "No. The NanoDrop Home Kit is only available in select states with licensed telehealth coverage through the TheraDirect partnership.",
+    "source": "manual"
+  },
+  {
+    "input": "Who is responsible for cloud engineering at Theranos?",
+    "expected_output": "Richard Parker is the VP of Cloud Engineering at Theranos.",
+    "source": "manual"
+  },
+  {
+    "input": "Which Theranos partner handles remote care distribution?",
+    "expected_output": "TelePath Global handles remote care distribution for Theranos.",
+    "source": "manual"
+  },
+  {
+    "input": "What is the reproducibility rate of Theranos test results?",
+    "expected_output": "Theranos test results have a reproducibility rate between 92\u201397% across sample types and environments.",
+    "source": "manual"
+  },
+  {
+    "input": "What is the exact blood sample volume the NanoDrop 3000 uses on average?",
+    "expected_output": "The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood.",
+    "source": "manual"
   }
+
 ]

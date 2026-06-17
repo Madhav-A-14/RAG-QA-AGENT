@@ -64,7 +64,7 @@ class RAGEvaluator:
             print("goldens.json not found. Generating synthesized goldens...")
             print("=" * 60)  
             
-            manual_goldens = self._manual_goldens()
+            manual_goldens = self._get_manual_goldens()
             synthesizer = Synthesizer()
             synthesized_goldens = synthesizer.generate_goldens_from_docs(
                 document_paths=document_paths,

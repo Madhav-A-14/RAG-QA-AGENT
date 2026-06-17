@@ -48,9 +48,9 @@ class RAGAgent:            #Class Declaration
             self,
             document_paths: list,
             embedding_model = None,
-            chunk_size: int = 500,
-            chunk_overlap: int = 50,
-            k: int = 2,
+            chunk_size: int = 300,
+            chunk_overlap: int = 60,
+            k: int = 5,
             chroma_persist_dir: str=None,
             chroma_collection_name: str="rag_docs"
     ):
