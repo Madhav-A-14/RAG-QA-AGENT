@@ -54,7 +54,7 @@ class RAGEvaluator:
                 for d in data
             ]  
             self.dataset = EvaluationDataset(goldens = all_goldens)
-            self.dataset.goldens = self.dataset.goldens[:3]  # ← add here
+    
             print(f"Loaded {len(all_goldens)} goldens "
             f"({sum(1 for d in data if d['source'] == 'manual')} manual, "
             f"{sum(1 for d in data if d['source'] == 'synthesized')} synthesized)")
@@ -74,7 +74,7 @@ class RAGEvaluator:
             
             all_goldens = manual_goldens + synthesized_goldens
             self.dataset = EvaluationDataset(goldens=all_goldens)
-            self.dataset.goldens = self.dataset.goldens[:3]  # ← add here
+            
             
             
             

@@ -74,13 +74,13 @@ def export_report(test_cases, results,output_file = "RAGEvaluation_report.xlsx")
             if col_idx >= metric_col_start and cell.value is not None:
                 cell.fill = score_high_fill if float(cell.value) >= 0.7 else score_low_fill
 
-    for col, width in {"A": 35, "B": 38, "C": 38, "D": 50}.items():
+    for col, width in {"A": 25, "B": 35, "C": 35, "D": 55}.items():
         ws.column_dimensions[col].width = width
     for i in range(len(results)):
-        ws.column_dimensions[get_column_letter(metric_col_start + i)].width = 22
+        ws.column_dimensions[get_column_letter(metric_col_start + i)].width = 20
     ws.row_dimensions[1].height = 30
     for row_idx in range(2, ws.max_row + 1):
-        ws.row_dimensions[row_idx].height = 80  
+        ws.row_dimensions[row_idx].height = 120
 
     ws2 = wb["Summary Report"]
 
