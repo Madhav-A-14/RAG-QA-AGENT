@@ -50,7 +50,7 @@ class RAGAgent:            #Class Declaration
             embedding_model = None,
             chunk_size: int = 300,
             chunk_overlap: int = 60,
-            k: int = 5,
+            k: int = 3,
             chroma_persist_dir: str=None,
             chroma_collection_name: str="rag_docs"
     ):

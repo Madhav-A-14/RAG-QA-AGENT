@@ -124,7 +124,7 @@ class RAGEvaluator:
             self.test_cases.append(
                 LLMTestCase(
                     input = query,
-                    actual_output=actual_output,
+                    actual_output=raw_response,
                     retrieval_context=retrieved_docs,
                     expected_output=expected,
                 )
