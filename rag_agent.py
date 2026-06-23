@@ -16,10 +16,14 @@ Format your response strictly as a JSON object with the following structure:
   {{
   "answer": "<a well-formatted answer using numbered points or bullet points with each point on a new line. Use \\n between each point for clarity>",
   "citations": [
-    "<relevant quoted snippet or summary from source 1>",
-    "<relevant quoted snippet or summary from source 2>",
-    ...
-  ]
+    {{
+        "source": "<filename>",
+        "lines": "<start_line> to <end_line>"
+        "text": "<exact snippet that directly supports the answer, not general context>"
+    }}
+]"
+    }}
+    ]
 }}
 
 Only include information that appears in the provided context. Do not make anything up.
@@ -48,7 +52,7 @@ class RAGAgent:            #Class Declaration
             self,
             document_paths: list,
             embedding_model = None,
-            chunk_size: int = 300,
+            chunk_size: int = 500,
             chunk_overlap: int = 60,
             k: int = 3,
             chroma_persist_dir: str=None,
@@ -69,12 +73,14 @@ class RAGAgent:            #Class Declaration
     def _load_vector_store(self):  
         if self.chroma_persist_dir:
             if os.path.exists(self.chroma_persist_dir) and os.listdir(self.chroma_persist_dir):
+                print()
                 print("\nLoading existing ChromaDB from Disk")
                 return Chroma(
                     persist_directory=self.chroma_persist_dir,
                     embedding_function=self.embedding_model,
                     collection_name = self.chroma_collection_name,
                 )
+            print()
             print("ChromaDB not found, Creating and Saving to Disk...")
             documents = []
             for document_path in self.document_paths:
@@ -84,7 +90,22 @@ class RAGAgent:            #Class Declaration
                     chunk_size = self.chunk_size,
                     chunk_overlap = self.chunk_overlap,
                 )
-                documents.extend(splitter.create_documents([raw_text]))
+                chunks = splitter.create_documents([raw_text])
+                
+                for chunk in chunks:
+                    chunk_text = chunk.page_content
+                    char_start = raw_text.find(chunk_text)
+                    char_end = char_start + len(chunk_text)
+                    start_line = raw_text[:char_start].count("\n") + 1  
+                    end_line = raw_text[:char_end].count("\n") + 1
+                    
+                    chunk.metadata = {
+                        "source" : document_path,
+                        "start_line" : start_line,
+                        "end_line" : end_line,
+                    }
+                documents.extend(chunks)
+                
             return Chroma.from_documents(
                 documents,
                 self.embedding_model,
@@ -98,7 +119,15 @@ class RAGAgent:            #Class Declaration
     def fetch(self,query:str):
         print("Retrieving relevant chunks...")
         docs = self.vector_store.similarity_search(query,k=self.k) # stored as document object
-        retrieved_docs = [doc.page_content for doc in docs]
+        retrieved_docs = []
+        for doc in docs:
+            retrieved_docs.append({
+                "content" : doc.page_content,
+                "source" : doc.metadata.get("source","unknown"),
+                "start_line":doc.metadata.get("start_line" , "?"),
+                "end_line" : doc.metadata.get("end_line" , "?")
+            })
+            
         return retrieved_docs
 
 
@@ -111,7 +140,12 @@ class RAGAgent:            #Class Declaration
             llm_model = None,
             prompt_template: str = None,
     ):
-        context = "\n".join(retrieved_docs)  # joining 2 strings into one
+        context_parts = []
+        for doc in retrieved_docs:
+            context_parts.append(
+                f"[Source: {doc['source']}, Lines {doc['start_line']}–{doc['end_line']}]\n{doc['content']}"
+            )
+        context = "\n\n".join(context_parts)
         model = llm_model or ChatOpenAI(model="gpt-5-nano")# Enabling/Setting the model 
         prompt = prompt_template or json_prompt_template# Setting the prompt template
         prompt = prompt.format(context=context,query=query)

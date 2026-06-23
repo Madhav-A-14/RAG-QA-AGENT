@@ -1,127 +1,102 @@
 [
   {
     "input": "What is the NanoDrop 3000?",
-    "expected_output": "The NanoDrop 3000 is Theranos's flagship compact portable diagnostic device capable of performing over 300 blood tests using just 1\u00e2\u20ac\u201c2 microliters of capillary blood, delivering lab-grade results in under 20 minutes.",
+    "expected_output": "The NanoDrop 3000 is a compact, portable diagnostic device capable of performing over 300 blood tests using just 1\u00e2\u20ac\u201c2 microliters of capillary blood. It integrates microfluidics, spectrometry, and Theranos's patented NanoAnalysis Engine to provide lab-grade results in under 20 minutes.",
     "source": "manual"
   },
   {
-    "input": "Which third-party health systems does TheraCloud integrate with?",
-    "expected_output": "TheraCloud integrates with EPIC, Cerner, and Apple Health via HL7 and FHIR protocols.",
+    "input": "Who founded Theranos Technologies Inc.?",
+    "expected_output": "Theranos Technologies Inc. was founded by Sherlock Holmes, who also serves as the CEO.",
     "source": "manual"
   },
   {
-    "input": "Does the NanoDrop 3000 have full FDA approval?",
-    "expected_output": "No. The NanoDrop 3000 is CE-marked and pending full FDA 510(k) clearance. It only received Emergency Use Approval for the COVID-19 MicroDrop Panel in 2021.",
+    "input": "What is TheraCloud and what does it do?",
+    "expected_output": "TheraCloud is Theranos's secure web and mobile platform. All NanoDrop 3000 tests are automatically uploaded to it. Patients and providers can review full diagnostic panels, trend health data over time, and receive personalized insights based on AI-powered analytics. It supports integration with EPIC, Cerner, and Apple Health via HL7 and FHIR protocols.",
+    "source": "manual"
+  },
+  {
+    "input": "What certifications does Theranos hold?",
+    "expected_output": "Theranos labs are CLIA-certified and CAP-accredited. The NanoDrop 3000 is CE-marked and pending full FDA 510(k) clearance for expanded panels.",
+    "source": "manual"
+  },
+  {
+    "input": "What is the battery life of the NanoDrop 3000?",
+    "expected_output": "The NanoDrop 3000 runs on a rechargeable lithium-ion battery with 18 hours of operation.",
+    "source": "manual"
+  },
+  {
+    "input": "What are the connectivity options of the NanoDrop 3000?",
+    "expected_output": "The NanoDrop 3000 supports encrypted Wi-Fi, Bluetooth, and USB-C connectivity.",
     "source": "manual"
   },
   {
     "input": "What is MicroVial Sensing?",
-    "expected_output": "MicroVial Sensing (MVS) is Theranos's next-generation detection framework combining nanophotonic arrays and adaptive sample calibration.",
+    "expected_output": "MicroVial Sensing (MVS) is Theranos's next-generation detection framework that combines nanophotonic arrays and adaptive sample calibration. It processes micro-samples through proprietary capillary modules, ensuring high sensitivity and reproducibility across a broad spectrum of biomarkers.",
     "source": "manual"
   },
   {
-    "input": "When did Theranos complete its Series F and how much was raised?",
-    "expected_output": "Theranos completed its Series F in Q1 2023, raising $240 million from Fidelity, BlackRock, and Sequoia Capital.",
+    "input": "How much funding did Theranos raise in its Series F round?",
+    "expected_output": "Theranos raised $240 million in its Series F funding round from Fidelity, BlackRock, and Sequoia Capital in Q1 2023.",
     "source": "manual"
   },
   {
-    "input": "Can anyone use the NanoDrop Home Kit regardless of location?",
-    "expected_output": "No. The NanoDrop Home Kit is only available in select states with licensed telehealth coverage through the TheraDirect partnership.",
+    "input": "Can Theranos tests be administered at home?",
+    "expected_output": "Yes. Through the TheraDirect partnership, patients can request a NanoDrop Home Kit, available in select states with licensed telehealth coverage.",
     "source": "manual"
   },
   {
-    "input": "Who is responsible for cloud engineering at Theranos?",
-    "expected_output": "Richard Parker is the VP of Cloud Engineering at Theranos.",
+    "input": "What are the use cases for the NanoDrop 3000?",
+    "expected_output": "The NanoDrop 3000 is used in primary care clinics for rapid diagnostics, pharmacies for in-store wellness panels, telemedicine for at-home blood testing, clinical trials for decentralized biomarker screening, and emergency settings for point-of-care triage.",
     "source": "manual"
   },
   {
-    "input": "Which Theranos partner handles remote care distribution?",
-    "expected_output": "TelePath Global handles remote care distribution for Theranos.",
-    "source": "manual"
-  },
-  {
-    "input": "What is the reproducibility rate of Theranos test results?",
-    "expected_output": "Theranos test results have a reproducibility rate between 92\u00e2\u20ac\u201c97% across sample types and environments.",
-    "source": "manual"
-  },
-  {
-    "input": "What is the exact blood sample volume the NanoDrop 3000 uses on average?",
-    "expected_output": "The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood.",
-    "source": "manual"
-  },
-  {
-    "input": "Can anyone use the NanoDrop Home Kit regardless of location?",
-    "expected_output": "No. The NanoDrop Home Kit is only available in select states with licensed telehealth coverage through the TheraDirect partnership.",
-    "source": "manual"
-  },
-  {
-    "input": "Who is responsible for cloud engineering at Theranos?",
-    "expected_output": "Richard Parker is the VP of Cloud Engineering at Theranos.",
-    "source": "manual"
-  },
-  {
-    "input": "Which Theranos partner handles remote care distribution?",
-    "expected_output": "TelePath Global handles remote care distribution for Theranos.",
-    "source": "manual"
-  },
-  {
-    "input": "What is the reproducibility rate of Theranos test results?",
-    "expected_output": "Theranos test results have a reproducibility rate between 92\u201397% across sample types and environments.",
-    "source": "manual"
-  },
-  {
-    "input": "What is the exact blood sample volume the NanoDrop 3000 uses on average?",
-    "expected_output": "The NanoDrop 3000 uses an average sample volume of 1.2 microliters of capillary blood.",
-    "source": "manual"
-  },
-  {
-    "input": "Identify Theranos\u2019s founder-CEO and relate that role to the firm\u2019s 2003 launch.",
-    "expected_output": "Theranos was founded in 2003 by Sherlock Holmes, who also serves as CEO. In relation to the company\u2019s 2003 launch, he has led the firm from its founding with the mission to revolutionize blood diagnostics through rapid, portable testing solutions.",
+    "input": "Outline NanoDrop 3000\u2019s role in decentralized pharmacogenomic screening across APAC telehealth networks.",
+    "expected_output": "NanoDrop 3000 can support decentralized pharmacogenomic screening across APAC telehealth networks by enabling 325+ assays, including pharmacogenomic testing added in Q3 2022, from just about 1.2 microliters of capillary blood with results in under 20 minutes. Its portable design and 18-hour battery make it suitable for at-home and remote care settings, while TheraCloud\u2122 allows secure sharing of results with patients and providers and supports integration through HL7 and FHIR.\n\nFor APAC rollout specifically, Theranos signed a strategic licensing deal with Medix Korea, which supports regional deployment. Combined with Theranos\u2019s telemedicine and at-home testing use cases, plus connectivity through encrypted Wi-Fi, Bluetooth, and USB-C, the NanoDrop 3000 is positioned for distributed pharmacogenomic screening across telehealth networks in the region.",
     "source": "synthesized"
   },
   {
-    "input": "How does Theranos\u2019s \u201cOne Drop Changes Everything\u2122\u201d mission relate to NanoDrop 3000 and TheraCloud?",
-    "expected_output": "Theranos\u2019s motto, \u201cOne Drop Changes Everything\u2122,\u201d is reflected in both the NanoDrop 3000 and TheraCloud.\n\n- **NanoDrop 3000** makes the \u201cone drop\u201d idea practical by performing **325+ blood tests from about 1.2 microliters of blood** and delivering **lab-grade results in under 20 minutes**.\n- **TheraCloud** extends the \u201cchanges everything\u201d part by automatically uploading results so **patients and providers can review panels, track trends over time, and get AI-powered insights**.\n\nTogether, they support Theranos\u2019s mission to make blood diagnostics **faster, more accessible, and more useful in real time**.",
+    "input": "If Theranos announced a new hub, who would lead it as founder & CEO?",
+    "expected_output": "The founder & CEO is Sherlock Holmes, so he would lead the new hub as founder & CEO.",
     "source": "synthesized"
   },
   {
-    "input": "How do NanoDrop 3000\u2019s 1\u20132 \u00b5L samples enable 325+ assays with lab-grade results?",
-    "expected_output": "NanoDrop 3000 achieves 325+ assays from just 1\u20132 \u00b5L of blood by combining microfluidics, spectrometry, and Theranos\u2019s patented NanoAnalysis Engine\u2122. Its MicroVial Sensing (MVS) platform uses nanophotonic arrays, adaptive sample calibration, and proprietary capillary modules to process micro-samples with high sensitivity and reproducibility across many biomarkers. According to the company, this enables lab-grade results in under 20 minutes, with independent studies reporting over 94% sensitivity and specificity for most core assays.",
+    "input": "Identify Theranos\u2019s flagship device and infer its core portable blood-testing function.",
+    "expected_output": "Theranos\u2019s flagship device is the **NanoDrop 3000\u2122**. Its core function is to provide **portable, rapid blood diagnostics**, performing **325+ blood tests from just 1\u20132 microliters of capillary blood** and delivering **lab-grade results in under 20 minutes**.",
     "source": "synthesized"
   },
   {
-    "input": "How do on-device output and TheraCloud syncing jointly deliver NanoDrop 3000 results?",
-    "expected_output": "NanoDrop 3000 delivers results in two ways: they appear directly on the device\u2019s display for immediate review, and they are also synced to TheraCloud\u2122 for secure access via web or mobile. Through TheraCloud, patients and providers can view full panels, track trends over time, and integrate data with systems like EPIC, Cerner, and Apple Health.",
+    "input": "If a clinic used NanoDrop 3000 for rapid screening, how many tests and blood volume?",
+    "expected_output": "A clinic using the NanoDrop 3000 for rapid screening could run 325+ assays using about 1.2 microliters of blood on average (within the 1\u20132 microliter range). Results are delivered in under 20 minutes.",
     "source": "synthesized"
   },
   {
-    "input": "Where is the NanoDrop 3000 325+ assay test menu available online or in-app?",
-    "expected_output": "The NanoDrop 3000 test menu is available at **theranos.com/products/nanodrop3000/testmenu** or through the **TheraCloud mobile app**.",
+    "input": "Which ext systems integrate with TheraCloud, and via which interoperability standards?",
+    "expected_output": "TheraCloud integrates with third-party systems including EPIC, Cerner, and Apple Health, using HL7 and FHIR interoperability standards.",
     "source": "synthesized"
   },
   {
-    "input": "Where can I view NanoDrop 3000's latest test menu, incl. via TheraCloud app?",
-    "expected_output": "You can view the latest NanoDrop 3000 test menu at **theranos.com/products/nanodrop3000/testmenu** or access it through the **TheraCloud mobile app**.",
+    "input": "Compare access options for NanoDrop 3000\u2019s latest test menu: website URL vs TheraCloud app.",
+    "expected_output": "You can access the latest NanoDrop 3000 test menu in two ways:\n\n- Website: visit **theranos.com/products/nanodrop3000/testmenu**\n- TheraCloud app: access it through the **TheraCloud mobile app**\n\nBoth provide the latest test menu for the NanoDrop 3000.",
     "source": "synthesized"
   },
   {
-    "input": "Where can I access NanoDrop 3000\u2019s latest test menu: theranos.com link or TheraCloud app?",
-    "expected_output": "You can access the latest NanoDrop 3000 test menu at **theranos.com/products/nanodrop3000/testmenu** or through the **TheraCloud mobile app**.",
+    "input": "Is it accurate NanoDrop 3000 performs 300+ blood tests using 1.2 \u00b5L avg blood?",
+    "expected_output": "Yes. According to the context, the NanoDrop 3000 can perform **over 300 blood tests**\u2014specifically **325+ assays**\u2014using an average sample volume of **1.2 microliters** of blood. It also states results are delivered in **under 20 minutes**.",
     "source": "synthesized"
   },
   {
-    "input": "Identify Theranos founder-CEO and relate this role to the firm\u2019s 2003 launch.",
-    "expected_output": "Sherlock Holmes is the Founder & CEO of Theranos Technologies Inc. Since the company was founded in 2003, this means he both launched the firm and continues to lead it as chief executive.",
+    "input": "If a press release named Theranos\u2019s Founder & CEO, who would it identify?",
+    "expected_output": "It would identify **Sherlock Holmes** as Theranos\u2019s Founder & CEO.",
     "source": "synthesized"
   },
   {
-    "input": "Compare Theranos\u2019s mission and company motto.",
-    "expected_output": "Theranos\u2019s mission is to revolutionize blood diagnostics through rapid, portable testing solutions, while its motto, \u201cOne Drop Changes Everything\u2122,\u201d expresses that goal in a short, memorable way by emphasizing the impact of small-volume blood testing.",
+    "input": "How can patients/providers access NanoDrop 3000 results via TheraCloud web/mobile and synced display?",
+    "expected_output": "Patients and providers can access NanoDrop 3000 results in three ways:\n\n- **On-device display:** Results appear directly on the NanoDrop 3000.\n- **TheraCloud web/mobile:** All test results are automatically uploaded to **TheraCloud\u2122**, where patients and providers can review full panels, track trends over time, and receive AI-powered insights.\n- **Synced access:** Results are synced through the secure **TheraCloud** platform, which supports web and mobile use and integrates with systems like **EPIC, Cerner, and Apple Health** via **HL7/FHIR**.",
     "source": "synthesized"
   },
   {
-    "input": "If avg sample is 1\u20132 \u00b5L capillary blood, how many assays can NanoDrop 3000 run?",
-    "expected_output": "NanoDrop 3000 can run over 300 blood tests; the test menu includes 325+ assays using about 1\u20132 microliters of capillary blood.",
+    "input": "What is Theranos Technologies Inc.'s mission to revolutionize blood diagnostics via rapid, portable testing?",
+    "expected_output": "Theranos Technologies Inc.\u2019s mission is to revolutionize blood diagnostics through rapid, portable testing solutions.",
     "source": "synthesized"
   }
 ]

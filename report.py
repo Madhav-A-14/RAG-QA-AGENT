@@ -12,17 +12,24 @@ def export_report(test_cases, results,output_file = "RAGEvaluation_report.xlsx")
     detailed_rows = []
     for i, tc in enumerate(test_cases):
         try:
-            parsed = json.loads(tc.actual_output)
-            actual_output = parsed.get("answer", tc.actual_output)
-            citations = "\n".join(f"• {c}" for c in parsed.get("citations", []))
+            parsed = json.loads(tc.comments)
+            actual_output = tc.actual_output
+            
+            citation_lines = []
+            for c in parsed.get("citations",[]):
+                source = c.get("source","unknown")
+                lines = c.get("lines", "")
+                text = c.get("text","")
+                citation_lines.append(f"[{source}, lines {lines}] {text}")
+            citations = "\n".join(citation_lines)
         except (json.JSONDecodeError, AttributeError):
             actual_output = tc.actual_output
             citations = ""
         row = {
             "Query" : tc.input,
             "Expected Output" : tc.expected_output,
-            "Actual Output" : tc.actual_output,
-            "Citations":         citations,
+            "Actual Output" : actual_output,
+            "Citations": citations,
             "Retrieved Context" :"\n---\n".join(tc.retrieval_context),
         }   
         for metric_name , scores in results.items():

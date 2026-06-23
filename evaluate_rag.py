@@ -68,7 +68,7 @@ class RAGEvaluator:
             synthesizer = Synthesizer()
             synthesized_goldens = synthesizer.generate_goldens_from_docs(
                 document_paths=document_paths,
-                max_goldens_per_context=5, # 5 per chunk × 2 chunks ≈ 10 total
+                max_goldens_per_context=5, 
             )
             print(f"Synthesized {len(synthesized_goldens)} goldens.")
             
@@ -108,6 +108,8 @@ class RAGEvaluator:
     
             # Retrieving relevant chunks from ChromaDB based on Query
             retrieved_docs = agent.fetch(query)
+            
+            retrieval_context = [doc["content"] for doc in retrieved_docs]
 
             # Sending the Retrieved content and the Query to LLM model to generate Answer.
             raw_response = agent.respond(query,retrieved_docs)
@@ -124,9 +126,10 @@ class RAGEvaluator:
             self.test_cases.append(
                 LLMTestCase(
                     input = query,
-                    actual_output=raw_response,
-                    retrieval_context=retrieved_docs,
+                    actual_output=actual_output,
+                    retrieval_context=retrieval_context,
                     expected_output=expected,
+                    comments = raw_response
                 )
             )
         print(f"\n✅ All {len(self.test_cases)} test cases built.\n")
