@@ -5,11 +5,11 @@ os.environ["CONFIDENT_AI_AUTO_OPEN_BROWSER"] = "NO"
 from config import agent
 
 from deepteam import red_team
-from deepteam.vulnerabilities import misinformation
+from deepteam.vulnerabilities import Misinformation
 from deepteam.attacks.single_turn import PromptInjection
 
 
-class RAGSecurity_Tester:
+class RAGSecurityTester:
     
     # ── Calling the RAG Model ─────────────────────────────────────────────────────
     
@@ -27,7 +27,7 @@ class RAGSecurity_Tester:
     def _build_vulnerabilities(self) -> list:
         
         return [
-            misinformation(types = ["factual errors","unsupported_claims"]),
+            Misinformation(types = ["factual_errors","unsupported_claims"]),
             
             
             
@@ -44,3 +44,47 @@ class RAGSecurity_Tester:
         return[
             PromptInjection(weight=2),
         ]
+        
+    
+    # ── Running the Attack ─────────────────────────────────────────────────────
+        
+        # This function ties every other function together 
+        
+    def run(self):
+        
+        print("\n" + "=" * 60)
+        print("PHASE 1 SECURITY TEST -- MISINFORMATION")
+        print("=" * 60)
+        
+        risk_assessment = red_team(
+            model_callback = self._model_callback,
+            vulnerabilities = self._build_vulnerabilities(),
+            attacks = self._build_attacks(),
+            max_concurrent=1,
+            
+        )
+        # Prints an overview of Risk Assessment done.
+        print("\n" + "=" * 60)
+        print("RISK ASSESSMENT OVERVIEW")
+        print("=" * 60)
+        print(risk_assessment.overview)
+
+        # Gives a detailed report of Risk Assessment done.
+        print("\n" + "=" * 60)
+        print("RISK ASSESSMENT OVERVIEW")
+        print("=" * 60)
+        print(risk_assessment.test_cases)
+
+        
+        # Saving everything to a Local Folder.
+        risk_assessment.save(to="./security-results/")
+        print("\nResults saved to ./security-results/")
+        
+        return risk_assessment
+    
+
+# Entry Point of the Code....
+
+if __name__ == "__main__":
+    tester = RAGSecurityTester()
+    tester.run()
