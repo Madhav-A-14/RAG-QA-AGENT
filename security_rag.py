@@ -3,22 +3,32 @@ os.environ["DEEPEVAL_TELEMETRY_OPT_OUT"] = "YES"
 os.environ["CONFIDENT_AI_AUTO_OPEN_BROWSER"] = "NO"
 
 from config import agent
+from unittest.mock import patch
 
 from deepteam import red_team
 from deepteam.vulnerabilities import Misinformation
 from deepteam.attacks.single_turn import PromptInjection
 
 
+# ── Calling the RAG Model ─────────────────────────────────────────────────────
+
+async def model_callback(input: str) -> str:
+    result = agent.ask(input)
+    if isinstance(result, dict):
+        return result.get("answer", str(result))
+    return str(result)
+
+
+
+def _noop_post(*args, **kwargs):
+    """Replaces the cloud-upload step with a no-op so we don't need
+    an Enterprise plan just to save results locally."""
+    print("\n[INFO] Skipping Confident AI cloud upload (not on Enterprise plan).")
+
+
 class RAGSecurityTester:
     
-    # ── Calling the RAG Model ─────────────────────────────────────────────────────
     
-    def _model_callback(self,input:str) -> str:
-        
-        result = agent.ask(input)
-        if isinstance(result,dict):
-            return result.get("answer",str(result))
-        return str(result)
     
     # ── Building the necessary Vulnerabilities ─────────────────────────────────────────────────────
 
@@ -56,13 +66,16 @@ class RAGSecurityTester:
         print("PHASE 1 SECURITY TEST -- MISINFORMATION")
         print("=" * 60)
         
-        risk_assessment = red_team(
-            model_callback = self._model_callback,
-            vulnerabilities = self._build_vulnerabilities(),
-            attacks = self._build_attacks(),
-            max_concurrent=1,
-            
-        )
+        with patch(
+            "deepteam.red_teamer.red_teamer.RedTeamer._post_risk_assessment",
+            new=_noop_post,
+        ):
+            risk_assessment = red_team(
+                model_callback=model_callback,
+                vulnerabilities=self._build_vulnerabilities(),
+                attacks=self._build_attacks(),
+                max_concurrent=1,
+            )
         # Prints an overview of Risk Assessment done.
         print("\n" + "=" * 60)
         print("RISK ASSESSMENT OVERVIEW")
