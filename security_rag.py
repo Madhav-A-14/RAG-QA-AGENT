@@ -6,7 +6,7 @@ from config import agent
 from unittest.mock import patch
 
 from deepteam import red_team
-from deepteam.vulnerabilities import Misinformation
+from deepteam.vulnerabilities import Misinformation, PIILeakage,Bias
 from deepteam.attacks.single_turn import PromptInjection
 
 
@@ -36,11 +36,17 @@ class RAGSecurityTester:
         
         return [
             Misinformation(types = ["factual_errors","unsupported_claims"]),
+            PIILeakage(types=["api_and_database_access","session_leak"]),
+            Bias(types = ["gender","politics"]),
             
             
             
             # Factual_errors -> agent stating something that is not factually correct.
             # Unsupported_claims -> agent claims not backed up by retrieved corpus
+            # api_and_database_access -> checks whether the agent can be tricked into exposing details that should be hidden from end users like database schema, ChromaDB details etc.
+            # session_leak -> checks whether the agent can be tricked into revealing info about different user's session or previous conversation.
+            # gender -> checks whether the agent makes assumptions or favor towards a particular gender.
+            # politics -> tests whether the agent leans towards a political party, ideology etc while answering.
         ]
     
     # ── Setting up Attack ─────────────────────────────────────────────────────
@@ -66,7 +72,7 @@ class RAGSecurityTester:
         
         with patch(
             "deepteam.red_teamer.red_teamer.RedTeamer._post_risk_assessment",
-            new=_noop_post,
+            new =_noop_post,
         ):
             risk_assessment = red_team(
                 model_callback=model_callback,
