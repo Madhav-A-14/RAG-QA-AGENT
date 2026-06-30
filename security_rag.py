@@ -21,8 +21,6 @@ async def model_callback(input: str) -> str:
 
 
 def _noop_post(*args, **kwargs):
-    """Replaces the cloud-upload step with a no-op so we don't need
-    an Enterprise plan just to save results locally."""
     print("\n[INFO] Skipping Confident AI cloud upload (not on Enterprise plan).")
 
 
@@ -75,6 +73,7 @@ class RAGSecurityTester:
                 vulnerabilities=self._build_vulnerabilities(),
                 attacks=self._build_attacks(),
                 max_concurrent=1,
+                attacks_per_vulnerability_type = 2,
             )
         # Prints an overview of Risk Assessment done.
         print("\n" + "=" * 60)
@@ -84,7 +83,7 @@ class RAGSecurityTester:
 
         # Gives a detailed report of Risk Assessment done.
         print("\n" + "=" * 60)
-        print("RISK ASSESSMENT OVERVIEW")
+        print("RISK ASSESSMENT TEST CASES")
         print("=" * 60)
         print(risk_assessment.test_cases)
 
