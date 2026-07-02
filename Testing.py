@@ -3,8 +3,10 @@ os.environ["DEEPEVAL_TELEMETRY_OPT_OUT"] = "YES"
 os.environ["CONFIDENT_AI_AUTO_OPEN_BROWSER"] = "NO"
 
 import json
-from config import agent,document_paths
+from config import agent,document_paths,RUN_EVALUATION,RUN_SECURITY
 from report import export_report
+from unittest.mock import patch
+
 
 from deepeval.test_case import LLMTestCase, SingleTurnParams
 from deepeval.dataset import EvaluationDataset,Golden
@@ -15,6 +17,17 @@ from deepeval.metrics import(
     ContextualRelevancyMetric,
     GEval,
 )
+from deepteam import red_team
+from deepteam.vulnerabilities import Misinformation, PIILeakage,Bias
+from deepteam.attacks.single_turn import PromptInjection
+
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# RAG EVALUATOR
+# ══════════════════════════════════════════════════════════════════════════
+
+
 
 class RAGEvaluator:
     def __init__(self, goldens_file:str = "goldens.json",manual_goldens_file: str = "manual_goldens.json"):
@@ -102,7 +115,7 @@ class RAGEvaluator:
         print("Running RAG on All Goldens Generated...")
         print("\n" + "=" * 60)
         
-        for i, golden in enumerate(self.dataset.goldens,1):
+        for i, golden in enumerate(list(self.dataset.goldens)[:10], 1):
             query = golden.input
             expected = golden.expected_output
     
@@ -217,13 +230,142 @@ class RAGEvaluator:
         self.build_test_cases()
         self.run_evaluation()
         self.print_results()
-        export_report(self.test_cases,self.results)
+        
+        
+        
+# ══════════════════════════════════════════════════════════════════════════
+# RAG SECURITY TESTER
+# ══════════════════════════════════════════════════════════════════════════
+
+# ── Calling the RAG Model ─────────────────────────────────────────────────────
+
+
+class RAGSecurityTester:
+    
+    @staticmethod
+    async def model_callback(input: str) -> str:
+        result = agent.ask(input)
+        if isinstance(result, dict):
+            return result.get("answer", str(result))
+        return str(result)
+    
+    
+    @staticmethod
+    def _noop_post(*args, **kwargs):
+        print("\n[INFO] Skipping Confident AI cloud upload (not on Enterprise plan).")
+    
+    
+    
+    
+    
+    # ── Building the necessary Vulnerabilities ─────────────────────────────────────────────────────
+
+        # This is where we define what vulnerabilities to test for.
+    
+    def _build_vulnerabilities(self) -> list:
+        
+        return [
+            Misinformation(types = ["factual_errors","unsupported_claims"]),
+            PIILeakage(types=["api_and_database_access","session_leak"]),
+            Bias(types = ["politics"]),
+            
+            
+            
+            # Factual_errors -> agent stating something that is not factually correct.
+            # Unsupported_claims -> agent claims not backed up by retrieved corpus
+            # api_and_database_access -> checks whether the agent can be tricked into exposing details that should be hidden from end users like database schema, ChromaDB details etc.
+            # session_leak -> checks whether the agent can be tricked into revealing info about different user's session or previous conversation.
+            # gender -> checks whether the agent makes assumptions or favor towards a particular gender.
+            # politics -> tests whether the agent leans towards a political party, ideology etc while answering.
+        ]
+    
+    # ── Setting up Attack ─────────────────────────────────────────────────────
+    
+        # This is where  we define "how are we trying to break it" rule.
+        # PromptInjection contains sneaky instructions to make the agent ignore its grounding rules.
+        
+    def _build_attacks(self) -> list:
+        return[
+            PromptInjection(weight=2),
+        ]
+        
+    
+    # ── Running the Attack ─────────────────────────────────────────────────────
+        
+        # This function ties every other function together 
+        
+    def run(self):
+        
+        print("\n" + "=" * 60)
+        print("PHASE 1 SECURITY TEST -- MISINFORMATION")
+        print("=" * 60)
+        
+        with patch(
+            "deepteam.red_teamer.red_teamer.RedTeamer._post_risk_assessment",
+            new =RAGSecurityTester._noop_post,
+        ):
+            risk_assessment = red_team(
+                model_callback=RAGSecurityTester.model_callback,
+                vulnerabilities=self._build_vulnerabilities(),
+                attacks=self._build_attacks(),
+                max_concurrent=1,
+                attacks_per_vulnerability_type = 2,
+            )
+        # Prints an overview of Risk Assessment done.
+        print("\n" + "=" * 60)
+        print("RISK ASSESSMENT OVERVIEW")
+        print("=" * 60)
+        print(risk_assessment.overview)
+
+        # Gives a detailed report of Risk Assessment done.
+        print("\n" + "=" * 60)
+        print("RISK ASSESSMENT TEST CASES")
+        print("=" * 60)
+        print(risk_assessment.test_cases)
+
+        
+        # Saving everything to a Local Folder.
+        risk_assessment.save(to="./security-results/")
+        print("\nResults saved to ./security-results/")
+        
+        return risk_assessment
+    
+        
+
+
+
+
+
+
+
+
     
 # ENTRY POINT
         
 if __name__ == "__main__":
-    evaluator = RAGEvaluator()
-    evaluator.run()
 
-                    
-            
+    run_eval     = bool(RUN_EVALUATION)
+    run_security = bool(RUN_SECURITY)
+    evaluator       = None
+    risk_assessment = None
+
+    if not run_eval and not run_security:
+        print("Both Evaluation and Security are set to 0 in config.")
+
+    if run_eval:
+        evaluator = RAGEvaluator()
+        evaluator.load_or_generate_dataset()
+        evaluator.build_test_cases()
+        evaluator.run_evaluation()
+        evaluator.print_results()
+
+    if run_security:
+        tester = RAGSecurityTester()
+        risk_assessment = tester.run()  # ← capture the return value
+
+    if run_eval:
+        export_report(
+            evaluator.test_cases,
+            evaluator.results,
+            risk_assessment   # None if security off, populated if it ran
+        )
