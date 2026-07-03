@@ -6,7 +6,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 
-def export_report(test_cases, results, risk_assessment=None, output_file="RAGEvaluation_report.xlsx"):
+def export_report(test_cases, results, risk_assessment=None, output_file="RAG_Test_report.xlsx"):
 
     # ── Build eval data ────────────────────────────────────────────────────────
     eval_data = []
@@ -81,7 +81,7 @@ def export_report(test_cases, results, risk_assessment=None, output_file="RAGEva
                 "Vulnerability":      data["vulnerability"],
                 "Vulnerability Type": vtype_str,
                 "Average Score":      round(avg, 3),
-                "Status":             "PASS" if avg >= 0.7 else "FAIL",
+                "Status":             "PASS" if avg >= 1.0 else "FAIL",
             })
 
     # ── Style constants ────────────────────────────────────────────────────────
@@ -300,20 +300,20 @@ def export_report(test_cases, results, risk_assessment=None, output_file="RAGEva
 
     # ══════════════════════════════════════════════════════════════════════════
     # SUMMARY REPORT — two side-by-side tables
-    # Eval:     cols A–D  (Metric | Avg Score | Status | Threshold)
-    # Gap:      col  E
-    # Security: cols F–J  (Vulnerability | Vulnerability Type | Avg Score | Status | Threshold)
+    # Eval:     cols A–C  (Metric | Avg Score | Status)
+    # Gap:      col  D
+    # Security: cols E–H  (Vulnerability | Vulnerability Type | Avg Score | Status)
     # ══════════════════════════════════════════════════════════════════════════
     ws2 = wb.create_sheet("Summary Report")
 
     # ── Eval summary table ─────────────────────────────────────────────────────
     et = ws2.cell(row=1, column=1, value="EVALUATION SUMMARY")
-    ws2.merge_cells("A1:D1")
+    ws2.merge_cells("A1:C1")
     et.font = mk_font(bold=True, color="FFFFFF", size=12)
     et.fill = mk_fill(EVAL_HEADER_COLOR); et.alignment = center; et.border = thin_border()
     ws2.row_dimensions[1].height = 28
 
-    for col_idx, h in enumerate(["Metric", "Average Score", "Status", "Threshold"], start=1):
+    for col_idx, h in enumerate(["Metric", "Average Score", "Status"], start=1):
         cell = ws2.cell(row=2, column=col_idx, value=h)
         cell.font = mk_font(bold=True, color="FFFFFF", size=11)
         cell.fill = mk_fill(EVAL_HEADER_COLOR); cell.alignment = center; cell.border = thin_border()
@@ -336,22 +336,20 @@ def export_report(test_cases, results, risk_assessment=None, output_file="RAGEva
         else:
             st.fill = mk_fill(FAIL_COLOR); st.font = mk_font(bold=True, color=FAIL_FONT_COLOR)
 
-        t = ws2.cell(row=r, column=4, value="≥ 0.7")
-        t.border = thin_border(); t.font = mk_font(); t.alignment = center
         ws2.row_dimensions[r].height = 28
 
     # ── Security summary table (cols F–J) ─────────────────────────────────────
     if risk_assessment is not None and sec_summary:
-        SC = 6   # col F
+        SC = 5   # col E
 
         st_banner = ws2.cell(row=1, column=SC, value="SECURITY TEST SUMMARY")
-        ws2.merge_cells(start_row=1, start_column=SC, end_row=1, end_column=SC + 4)
+        ws2.merge_cells(start_row=1, start_column=SC, end_row=1, end_column=SC + 3)
         st_banner.font = mk_font(bold=True, color="FFFFFF", size=12)
         st_banner.fill = mk_fill(SEC_HEADER_COLOR)
         st_banner.alignment = center; st_banner.border = thin_border()
 
         for col_idx, h in enumerate(
-            ["Vulnerability", "Vulnerability Type", "Average Score", "Status", "Threshold"],
+            ["Vulnerability", "Vulnerability Type", "Average Score", "Status"],
             start=SC
         ):
             cell = ws2.cell(row=2, column=col_idx, value=h)
@@ -369,7 +367,7 @@ def export_report(test_cases, results, risk_assessment=None, output_file="RAGEva
             s = ws2.cell(row=r, column=SC + 2, value=rd["Average Score"])
             s.border = thin_border(); s.font = mk_font(); s.alignment = center
             try:
-                s.fill = mk_fill(SCORE_HIGH_COLOR if float(rd["Average Score"]) >= 0.7 else SCORE_LOW_COLOR)
+                s.fill = mk_fill(SCORE_HIGH_COLOR if float(rd["Average Score"]) >= 1.0 else SCORE_LOW_COLOR)
             except (ValueError, TypeError): pass
 
             st = ws2.cell(row=r, column=SC + 3, value=rd["Status"])
@@ -379,21 +377,17 @@ def export_report(test_cases, results, risk_assessment=None, output_file="RAGEva
             else:
                 st.fill = mk_fill(FAIL_COLOR); st.font = mk_font(bold=True, color=FAIL_FONT_COLOR)
 
-            t = ws2.cell(row=r, column=SC + 4, value="≥ 0.7")
-            t.border = thin_border(); t.font = mk_font(); t.alignment = center
             ws2.row_dimensions[r].height = 28
 
     # ── Summary column widths ──────────────────────────────────────────────────
     ws2.column_dimensions["A"].width = 28   # Metric
     ws2.column_dimensions["B"].width = 16   # Avg Score
     ws2.column_dimensions["C"].width = 12   # Status
-    ws2.column_dimensions["D"].width = 12   # Threshold
-    ws2.column_dimensions["E"].width = 4    # gap
-    ws2.column_dimensions["F"].width = 22   # Vulnerability
-    ws2.column_dimensions["G"].width = 26   # Vulnerability Type
-    ws2.column_dimensions["H"].width = 16   # Avg Score
-    ws2.column_dimensions["I"].width = 12   # Status
-    ws2.column_dimensions["J"].width = 12   # Threshold
+    ws2.column_dimensions["D"].width = 4    # gap
+    ws2.column_dimensions["E"].width = 22   # Vulnerability
+    ws2.column_dimensions["F"].width = 26   # Vulnerability Type
+    ws2.column_dimensions["G"].width = 16   # Avg Score
+    ws2.column_dimensions["H"].width = 12   # Status
 
     wb.save(output_file)
     print(f"\n📊 Report saved as {output_file}")

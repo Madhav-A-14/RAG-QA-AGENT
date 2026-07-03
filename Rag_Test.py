@@ -297,7 +297,7 @@ class RAGSecurityTester:
     def run(self):
         
         print("\n" + "=" * 60)
-        print("PHASE 1 SECURITY TEST -- MISINFORMATION")
+        print("--  SECURITY TEST -- ")
         print("=" * 60)
         
         with patch(
