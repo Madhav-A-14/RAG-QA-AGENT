@@ -13,17 +13,14 @@ json_prompt_template = """ You are a helpful assistant. Use the context below to
 Format your response strictly as a JSON object with the following structure:
 
 {{
-  {{
   "answer": "<a well-formatted answer using numbered points or bullet points with each point on a new line. Use \\n between each point for clarity>",
   "citations": [
     {{
         "source": "<filename>",
-        "lines": "<start_line> to <end_line>"
+        "lines": "<start_line> to <end_line>",
         "text": "<exact snippet that directly supports the answer, not general context>"
     }}
-]"
-    }}
-    ]
+  ]
 }}
 
 Only include information that appears in the provided context. Do not make anything up.
