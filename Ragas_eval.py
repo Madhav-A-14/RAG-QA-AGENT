@@ -22,7 +22,11 @@ class RagasEvaluator:
         self.results = {}
         
         client = AsyncOpenAI()
-        self.llm = llm_factory(model_name, client = client)
+        self.llm = llm_factory(
+            model_name,
+            client = client,
+            max_tokens = 8192,
+        )
         self.embeddings = embedding_factory(
             "openai", model="text-embedding-3-small", client=client
         )
@@ -36,49 +40,48 @@ class RagasEvaluator:
             "Context_Recall" : ContextRecall(llm = self.llm),
             "Faithfullness" : Faithfulness(llm = self.llm),
             "Factual_Correctness" : FactualCorrectness(llm = self.llm),
-            "Answer_Relevancy" : AnswerRelevancy(llm = self.llm,embeddings=self.e)
+            "Answer_Relevancy" : AnswerRelevancy(llm = self.llm,embeddings=self.embeddings)
         }
         
         
-    async def _scoring(self, name:str, metric, case) -> float:
+    async def _scoring(self, name: str, metric, case) -> float:
         if name == "Context_Precision":
             result = await metric.ascore(
-                query = case.input,
-                expected = case.expected_output,
-                retrieved = case.retrieval_context,
+                user_input=case.input,
+                reference=case.expected_output,
+                retrieved_contexts=case.retrieval_context,
             )
         elif name == "Context_Recall":
             result = await metric.ascore(
-                query = case.input,
-                expected = case.expected_output,
-                retrieved = case.retrieval_context,
+                user_input=case.input,
+                retrieved_contexts=case.retrieval_context,
+                reference=case.expected_output,
             )
         elif name == "Faithfullness":
-             result = await metric.ascore(
-                query = case.input,
-                response = case.actual_output,
-                retrieved = case.retrieval_context,
+            result = await metric.ascore(
+                user_input=case.input,
+                response=case.actual_output,
+                retrieved_contexts=case.retrieval_context,
             )
         elif name == "Factual_Correctness":
             result = await metric.ascore(
-                query = case.input,
-                response = case.actual_output,
-                
+                response=case.actual_output,
+                reference=case.expected_output,
             )
         elif name == "Answer_Relevancy":
             result = await metric.ascore(
-                query = case.input,
-                response = case.actual_output,
+                user_input=case.input,
+                response=case.actual_output,
                 
             )
         else:
-            raise ValueError(f"Unknown Metric :{name}")
-        
+            raise ValueError(f"Unknown Metric: {name}")
+
         return result.value
     
     # Run Ragas Evaluation
     
-    async def run_ragas(self):
+    async def run_evaluation(self):
         
         metric_map = self.build_metrics()
         self.results = {name: [] for name in metric_map}
@@ -86,6 +89,45 @@ class RagasEvaluator:
         for i, case in enumerate(self.test_cases,1):
             print(f"\n[Ragas] Evaluating test case {i}/{len(self.test_cases)}...")
             for name, metic in metric_map.items():
-                score = await self.score_one(name,metic,case)
-                self.results[name].append[score]
+                score = await self._scoring(name,metic,case)
+                self.results[name].append(score)
+    
+    
+    # This function runs the scoring part and stores the results.
+    def run_ragas(self):
+        asyncio.run(self.run_evaluation())
+        
+    # Print Results 
+    def print_results(self):
+    
+        print("\n" + "=" * 60)
+        print("FINAL RESULTS (avg across all test cases)")
+        print("=" * 60)
+    
+        for metric_name, scores in self.results.items():
+            avg = sum(scores) / len(scores)
+            status = "PASS ✅" if avg >= 0.7 else "FAIL ❌"
+            print(f"{metric_name:<35} {avg:.2f}  {status}")
+        
+    # ── run() ties everything together ────────────────────────────────────
+
+    def run(self):
+        self.run_ragas()
+        self.print_results()
+        
+
+
+# ENTRY POINT
+        
+if __name__ == "__main__":
+        
+    # Calling RAGEvaluator to use already built testcases.
+    deepeval = RAGEvaluator()
+    deepeval.load_or_generate_dataset()
+    deepeval.build_test_cases()
+    
+    
+    ragas = RagasEvaluator(deepeval.test_cases)
+    ragas.run()
+    
     
