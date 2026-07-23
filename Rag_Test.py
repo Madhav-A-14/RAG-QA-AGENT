@@ -3,7 +3,9 @@ os.environ["DEEPEVAL_TELEMETRY_OPT_OUT"] = "YES"
 os.environ["CONFIDENT_AI_AUTO_OPEN_BROWSER"] = "NO"
 
 import json
-from config import agent,document_paths,RUN_EVALUATION,RUN_SECURITY
+import asyncio
+from openai import AsyncOpenAI
+from config import agent,document_paths,RUN_DEEPEVAL,RUN_SECURITY,RUN_RAGAS,RUN_REPORT
 from report import export_report
 from unittest.mock import patch
 
@@ -17,6 +19,17 @@ from deepeval.metrics import(
     ContextualRelevancyMetric,
     GEval,
 )
+
+from ragas.llms import llm_factory
+from ragas.embeddings.base import embedding_factory
+from ragas.metrics.collections import(
+    Faithfulness,
+    ContextPrecision,
+    ContextRecall,
+    AnswerRelevancy,
+    FactualCorrectness,
+)
+
 from deepteam import red_team
 from deepteam.vulnerabilities import Misinformation, PIILeakage,Bias
 from deepteam.attacks.single_turn import PromptInjection
@@ -232,6 +245,116 @@ class RAGEvaluator:
         self.print_results()
         
         
+# ══════════════════════════════════════════════════════════════════════════
+# RAGAS RAG EVALUATOR
+# ══════════════════════════════════════════════════════════════════════════
+
+
+class RagasEvaluator:
+    """
+     Uses the same testcases generated in Deepteam code.
+    """
+    
+    def __init__(self, test_cases:list, model_name: str = "gpt-5-nano"):
+        self.test_cases = test_cases
+        self.results = {}
+        
+        client = AsyncOpenAI()
+        self.llm = llm_factory(
+            model_name,
+            client = client,
+            max_tokens = 8192,
+        )
+        self.embeddings = embedding_factory(
+            "openai", model="text-embedding-3-small", client=client
+        )
+        
+    
+    # Definig Ragas Metrics
+    
+    def build_metrics(self) -> dict :
+        return{
+            "Context_Precision" : ContextPrecision(llm = self.llm),
+            "Context_Recall" : ContextRecall(llm = self.llm),
+            "Faithfullness" : Faithfulness(llm = self.llm),
+            "Factual_Correctness" : FactualCorrectness(llm = self.llm),
+            "Answer_Relevancy" : AnswerRelevancy(llm = self.llm,embeddings=self.embeddings)
+        }
+        
+        
+    async def _scoring(self, name: str, metric, case) -> float:
+        if name == "Context_Precision":
+            result = await metric.ascore(
+                user_input=case.input,
+                reference=case.expected_output,
+                retrieved_contexts=case.retrieval_context,
+            )
+        elif name == "Context_Recall":
+            result = await metric.ascore(
+                user_input=case.input,
+                retrieved_contexts=case.retrieval_context,
+                reference=case.expected_output,
+            )
+        elif name == "Faithfullness":
+            result = await metric.ascore(
+                user_input=case.input,
+                response=case.actual_output,
+                retrieved_contexts=case.retrieval_context,
+            )
+        elif name == "Factual_Correctness":
+            result = await metric.ascore(
+                response=case.actual_output,
+                reference=case.expected_output,
+            )
+        elif name == "Answer_Relevancy":
+            result = await metric.ascore(
+                user_input=case.input,
+                response=case.actual_output,
+                
+            )
+        else:
+            raise ValueError(f"Unknown Metric: {name}")
+
+        return result.value
+    
+    # Run Ragas Evaluation
+    
+    async def run_evaluation(self):
+        
+        metric_map = self.build_metrics()
+        self.results = {name: [] for name in metric_map}
+        
+        for i, case in enumerate(self.test_cases,1):
+            print(f"\n[Ragas] Evaluating test case {i}/{len(self.test_cases)}...")
+            for name, metic in metric_map.items():
+                score = await self._scoring(name,metic,case)
+                self.results[name].append(score)
+    
+    
+    # This function runs the scoring part and stores the results.
+    def run_ragas(self):
+        asyncio.run(self.run_evaluation())
+        
+    # Print Results 
+    def print_results(self):
+    
+        print("\n" + "=" * 60)
+        print("FINAL RESULTS (avg across all test cases)")
+        print("=" * 60)
+    
+        for metric_name, scores in self.results.items():
+            avg = sum(scores) / len(scores)
+            status = "PASS ✅" if avg >= 0.7 else "FAIL ❌"
+            print(f"{metric_name:<35} {avg:.2f}  {status}")
+        
+    # ── run() ties everything together ────────────────────────────────────
+
+    def run(self):
+        self.run_ragas()
+        self.print_results()
+        
+     
+        
         
 # ══════════════════════════════════════════════════════════════════════════
 # DEEPTEAM RAG SECURITY TESTING 
@@ -344,28 +467,41 @@ class RAGSecurityTester:
         
 if __name__ == "__main__":
 
-    run_eval     = bool(RUN_EVALUATION)
+    run_deepeval     = bool(RUN_DEEPEVAL) # DeepEval Evaluation
     run_security = bool(RUN_SECURITY)
-    evaluator       = None
+    run_ragas    = bool(RUN_RAGAS)
+    run_report   = bool(RUN_REPORT)
+    deepeval_evaluator = None
     risk_assessment = None
+    ragas_evaluator = None
 
-    if not run_eval and not run_security:
+    if not run_deepeval and not run_security:
         print("Both Evaluation and Security are set to 0 in config.")
 
-    if run_eval:
-        evaluator = RAGEvaluator()
-        evaluator.load_or_generate_dataset()
-        evaluator.build_test_cases()
-        evaluator.run_evaluation()
-        evaluator.print_results()
+    if run_deepeval:
+        deepeval_evaluator = RAGEvaluator()
+        deepeval_evaluator.load_or_generate_dataset()
+        deepeval_evaluator.build_test_cases()
+        deepeval_evaluator.run_evaluation()
+        deepeval_evaluator.print_results()
+        
+    if run_ragas:
+        if deepeval_evaluator is None:
+            deepeval_evaluator = RAGEvaluator()
+            deepeval_evaluator.load_or_generate_dataset()
+            deepeval_evaluator.build_test_cases()
+        
+        ragas_evaluator = RagasEvaluator(deepeval_evaluator.test_cases)
+        ragas_evaluator.run()
 
     if run_security:
         tester = RAGSecurityTester()
         risk_assessment = tester.run()  # ← capture the return value
 
-    if run_eval:
+    if run_deepeval and run_report:
         export_report(
-            evaluator.test_cases,
-            evaluator.results,
-            risk_assessment   # None if security off, populated if it ran
+            deepeval_evaluator.test_cases,
+            deepeval_evaluator.results,
+            risk_assessment,   # None if security off, populated if it ran
+            ragas_evaluator.results if ragas_evaluator else None
         )

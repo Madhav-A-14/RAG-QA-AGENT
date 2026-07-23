@@ -7,8 +7,11 @@ load_dotenv()
 # ── Run Flags ──────────────────────────────────────────────────────────────
 # Set 1 to enable, 0 to disable
 
-RUN_EVALUATION = 1
+RUN_DEEPEVAL = 1
 RUN_SECURITY   = 1
+RUN_RAGAS = 1
+RUN_REPORT = 0
+
 
 
 
