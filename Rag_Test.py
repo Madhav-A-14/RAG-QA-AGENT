@@ -167,9 +167,9 @@ class RAGEvaluator:
         
         return{
             # Retiriever Metrics
-            "Contextual_Relevancy":ContextualRelevancyMetric(threshold=0.7,verbose_mode=True),
-            "Contextual_Recall":ContextualRecallMetric(threshold=0.7,verbose_mode=True),
-            "Contextual_Precision":ContextualPrecisionMetric(threshold=0.7,verbose_mode=True),
+            "Contextual_Relevancy":ContextualRelevancyMetric(threshold=0.7,verbose_mode=False),
+            "Contextual_Recall":ContextualRecallMetric(threshold=0.7,verbose_mode=False),
+            "Contextual_Precision":ContextualPrecisionMetric(threshold=0.7,verbose_mode=False),
             # Generator Metrics
             "Answer_Correctness": GEval(
                 name = "Answer Correctness",
@@ -184,7 +184,7 @@ class RAGEvaluator:
                     SingleTurnParams.RETRIEVAL_CONTEXT,
                 ],
                 threshold= 0.7,
-                verbose_mode=True
+                verbose_mode=False
             ),
             "Citation_Accuracy": GEval(
                 name = "Citation Accuracy",
@@ -199,7 +199,7 @@ class RAGEvaluator:
                     SingleTurnParams.RETRIEVAL_CONTEXT,
                 ],
                 threshold= 0.7,
-                verbose_mode=True
+                verbose_mode=False
             )
     
         }
@@ -208,7 +208,7 @@ class RAGEvaluator:
     def run_evaluation(self):
         
         print("="*60)
-        print("DEEPEVAL -- RETRIEVER & GENERATOR METRICS")
+        print("----- DEEPEVAL EVALUATION FRAMEWORK ----- ")
         print("="*60)
         
         metric_map = self.build_metrics()
@@ -217,7 +217,7 @@ class RAGEvaluator:
             self.results[name] = []
         
         for i, test_cases in enumerate(self.test_cases,1):
-            print(f"\nEvaluating test case {i}/{len(self.test_cases)}....")
+            print(f"\n[DeepEval] Evaluating test case {i}/{len(self.test_cases)}....")
             for name,metric in metric_map.items():
                 metric.measure(test_cases)
                 self.results[name].append(metric.score)
@@ -321,6 +321,10 @@ class RagasEvaluator:
     
     async def run_evaluation(self):
         
+        print("\n" + "=" * 60)
+        print("----- RAGAS EVALUATION FRAMEWORK ----- ")
+        print("=" * 60)
+        
         metric_map = self.build_metrics()
         self.results = {name: [] for name in metric_map}
         
@@ -420,7 +424,7 @@ class RAGSecurityTester:
     def run(self):
         
         print("\n" + "=" * 60)
-        print("--  SECURITY TEST -- ")
+        print("----- DEEPTEAM SECURITY TEST FRAMEWORK ----- ")
         print("=" * 60)
         
         with patch(
@@ -434,17 +438,7 @@ class RAGSecurityTester:
                 max_concurrent=1,
                 attacks_per_vulnerability_type = 2,
             )
-        # Prints an overview of Risk Assessment done.
-        print("\n" + "=" * 60)
-        print("RISK ASSESSMENT OVERVIEW")
-        print("=" * 60)
-        print(risk_assessment.overview)
-
-        # Gives a detailed report of Risk Assessment done.
-        print("\n" + "=" * 60)
-        print("RISK ASSESSMENT TEST CASES")
-        print("=" * 60)
-        print(risk_assessment.test_cases)
+        
 
         
         # Saving everything to a Local Folder.
@@ -475,9 +469,9 @@ if __name__ == "__main__":
     risk_assessment = None
     ragas_evaluator = None
 
-    if not run_deepeval and not run_security:
-        print("Both Evaluation and Security are set to 0 in config.")
-
+    if not run_deepeval and not run_security and not run_ragas:
+        print("Evaluation, Security, and Ragas are all set to 0 in config.")
+        
     if run_deepeval:
         deepeval_evaluator = RAGEvaluator()
         deepeval_evaluator.load_or_generate_dataset()

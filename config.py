@@ -10,7 +10,7 @@ load_dotenv()
 RUN_DEEPEVAL = 1
 RUN_SECURITY   = 1
 RUN_RAGAS = 1
-RUN_REPORT = 0
+RUN_REPORT = 1
 
 
 
