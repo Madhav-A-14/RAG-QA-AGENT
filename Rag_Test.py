@@ -252,7 +252,7 @@ class RAGEvaluator:
 
 class RagasEvaluator:
     """
-     Uses the same testcases generated in Deepteam code.
+     Uses the same testcases generated in DeepEval code.
     """
     
     def __init__(self, test_cases:list, model_name: str = "gpt-5-nano"):
