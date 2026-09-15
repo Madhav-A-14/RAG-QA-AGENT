@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------------------------------------------------------                
+                
+                RAG Documentation — Part 1: RAG Agent Creation (rag_agent.py)
+
+---------------------------------------------------------------------------------------------------------------------------                
+
+
+
+
+Goal : Build a simple RAG-qa Agent - that answers queries from a document corpus by retrieving relevant 
+        chunks from the corpus based on the queries and generating answers from them
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+Step 1 : Development
+----------------------
+Started with creating the Rag qa agent. Used deepeval site https://deepeval.com/tutorials/rag-qa-agent/development
+as reference for creating rag application from scratch. Used Theranos.txt file from the above site as corpus for
+rag creation. As per the link, chose Langchain as the framework, used OpenAIEmbeddings to convert text 
+to numbers and used FAISS(Facebook AI Similarity Search) as vector store to store the vectors of the corpus. 
+Used gpt-5-nano as the LLM to generate answers.  
+
+Step 2 : Switching FAISS to ChromaDB
+---------------------------------------
+
+While code was being created with reference to the deepeval website, vector store was changed from FAISS to 
+ChromaDB. It was done because the vectors created by FAISS doesnt get saved in disk - so the vectors created
+gets cleared when code restarts which leads to high token usage. If needed to save the vectors, have to manually 
+save it and load it back later. Instead ChromaDb was choosen as it acts as a database which holds the embeddings
+and handles vector search as well - links original text with its embeddings -  and saves everything to 
+disk automatically.
+
+
+Step 3: Added checking before rebuilding 
+----------------------------------------------
+
+When agent runs, it first checks whether Chroma folder of that specific corpus exist on disk(and has files in it).
+If so, it loads that existing datastore and only if there is no folder, it reads the corpus, chunks it and build
+a fresh one. This is done as re-embedding exisiting doecuments would waste time and API calls.
+
+
+Step 4: Added proper JSON response with citations and line numbers
+--------------------------------------------------------------------
+
+At first the agent gave simple text repsonses back. Just the answer only in text format. It was then changed to 
+proper JSON format with answer and citations keys. As normal text output is hard to verify if it is true or not 
+and by adding json response, it will benefit in evaluation process. 
+
+Step 5: Setting up Config.py
+----------------------------------
+
+Corpus path, agent settings, and Chroma path were originally hardcoded inline. 
+Pulled into a shared config.py so other scripts (like the evaluator) can import the same settings instead of 
+duplicating them.
+
+
+Step 6: Added Chat.py
+--------------------------
+
+Moved the "run the agent" loop out of rag_agent.py into its own chat.py. Keeps the agent file focused purely 
+on agent logic, and gives one simple entry point to actually talk to it.
+
+
+
+RESULT :
+----------------------------
+
+RAG Agent is complete -- Answers queries correctly using the Theranos.txt file as the corpus document. 
+
+Flow: 
+User query is converted to embeddings, those embeddings are used to search the vector store and retrieve the most
+relevant chunks from the corpus, and then the original query plus the retrieved chunks are sent to the LLM to 
+generate the final response.
+
+
+File Structure (RAG Creation):
+-----------------------------------------
+- rag_agent.py   -> core agent logic (retrieval + generation)
+- config.py      -> shared paths/settings 
+- chat.py        -> entry point to run and query the agent
+
+
+NEXT ----> RAG EVALUATION -- Evaluating Agent's retrieval and answer quality using DeepEval Framework 
+           (refer PART - 2 - RAG EVALUATION.txt )
+
+
+
+

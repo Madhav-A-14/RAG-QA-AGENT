@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------------------------------------------------------                
+                
+                RAG Documentation — Part 2: RAG Agent Evaluation (Rag_Test.py)
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+
+Goal: Evaluate the RAG agent built in Part 1 — checking both retrieval quality (are the right chunks being fetched)
+      and answer quality (is the LLM's response accurate) — using the DeepEval framework.
+
+
+
+Starting point:  RAG agent (rag_agent.py) is complete and answering queries correctly against the Theranos.txt 
+corpus (see Part 1). This section covers building a consistent set of test questions (goldens), turning agent 
+responses into evaluatable test cases, and defining metrics to score them.
+
+------------------------------------------------------------------------------------------------------------------
+
+
+
+Step 7 : Creating manual goldens(manual qa pairs):
+-------------------------------------------------
+
+manual_goldens.json file is created which contains a set of straightfoward questions curated from the corpus 
+Theranos.txt, so as to test against a set of questions consistently instead of testing with random buch of 
+goldens each and every time.
+
+_get_manual_goldens() function inside RAGEvaluator class : converts each entry into an DeepEval object to be
+used later on.
+
+
+Step 8 : Creating Synthesized goldens
+----------------------------------------
+
+
+Uses DeepEval's Synthesizer to auto-generate harder, more realistic questions from the corpus — catching edge 
+cases that manual goldens might miss.The load_or_generate_dataset() checks if goldens.json already exists; 
+if not, it generates synthesized goldens, merges them with the manual goldens (tagged manual/synthesized), 
+and saves the combined file as goldens.json. Skips regeneration if the file's already there, 
+since synthesizing costs time and API calls.
+
+
+Step 9 : Building TestCases for Evaluation
+---------------------------------------------
+
+For each golden in goldens.json, calls agent.fetch() to retrieve chunks, agent.respond() to generate an answer,
+extract the answer field from the JSON response recieved, then package (query, actual output, expected output, 
+retrieved context) into a DeepEval LLMTestCase. The build_test_cases() does this for the first 10 goldens 
+and appends each to self.test_cases.
+
+
+Step 10: Defining DeepEval Metrics
+------------------------------------
+
+
+build_metrics() in RAGEvaluator defines the metrics used to score the test cases from Step 9. Split into two 
+groups:
+
+Retriever metrics (check if the right chunks were fetched):
+
+  - Contextual Relevancy  -> checks if the retrieved chunks are actually relevant to the query, flags
+                             irrelevant chunks being pulled in
+  - Contextual Recall     -> checks if all the information needed to fully answer the query was retrieved, 
+                             flags missing relevant chunks
+  - Contextual Precision  -> checks if the most relevant chunks are ranked higher than less relevant ones 
+                             in the retrieved set
+
+Generator metrics (check if the answer generated from those chunks is good) — built using DeepEval's GEval, 
+which uses an LLM to grade against custom criteria(LLM as a judge):
+
+  - Answer Correctness —> checks if the answer is correct and complete, flags vague/incomplete/fabricated 
+                          answers
+  - Citation Accuracy  —> checks if citations in the answer are genuinely supported by the retrieved context, 
+                          flags hallucinated or irrelevant citations
+
+All metrics use a threshold of 0.7 to pass.
+
+
+
+Step 11 : Running DeepEval Evaluation on RAG Agent
+-----------------------------------------------------
+
+run_evaluation() loops through every test case and runs all 5 metrics from Step 10 against each one, storing 
+each score. The print_results() then averages the scores per metric across all test cases and prints PASS/FAIL 
+against the 0.7 threshold.
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+RESULT:
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+DeepEval Evaluation pipeline is complete -- goldens(manual & synthesized) are built into testcases and scored 
+against all 5 metrics(3 retriever & 2 generator) and the results are printed as average PASS/FAIL per metirc and 
+displayed in cmd.
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FILE STRUCTURE :
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+- Rag_Test.py       -> RAGEvaluator class (goldens -> test cases -> metrics -> results)
+- goldens.json      -> combined manual + synthesized goldens
+- manual_goldens.json -> manually curated basic questions
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TO RUN :
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+uv run Rag_Test.py
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+NEXT : 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+Expanding existing evaluation with additional frameworks (Ragas, DeepTeam) and unifying everything into one 
+report (see Part 3 - Multi-Framework Evaluation & Reporting).

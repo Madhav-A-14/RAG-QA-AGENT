@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------------------------------------------------------                
+                
+                RAG Documentation — Part 3: RAG Agent Multi Framework Evaluation (Rag_Test.py)
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+Goal :  Expand evaluation beyond DeepEval by adding RAGAS frameworks to cross-check answer quality of both DeepTeam
+        and Ragas frameworks and security test the agent against adversarial using DeepTeam framework, 
+        then consolidate all results into a single unified report.
+
+
+
+Starting point : DeepEval evaluation pipeline is complete — goldens, test cases, and 5 quality metrics are 
+                 in place and producing PASS/FAIL results (see Part 2). This section covers adding two more
+                 evaluation frameworks on top of that same pipeline, then tying everything together into 
+                 one report and one config.
+
+
+NOTE : DeepEval and Ragas both evaluate answer/retrieval quality — does the agent answer correctly under 
+       normal use. DeepTeam evaluates security — does the agent hold up when someone actively tries to break it. 
+       Different axis, same overall goal of evaluating the agent.
+
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+Step 12 : Adding Ragas Evaluation Framework
+-------------------------------------------
+
+Added a second, independent evaluation framework — Ragas — so as to cross-check alongside DeepEval, and to have 
+another alternate result rather than blindly trusting on the results from DeepEval. -- reusing the 
+same test cases built in Step 9 (RagasEvaluator takes DeepEval's test_cases directly, no rebuilding needed).
+
+Ragas metrics used:
+  - Context Precision, Context Recall — retriever quality (Ragas' equivalent of DeepEval's contextual metrics)
+  - Faithfulness — checks the answer doesn't contradict/hallucinate beyond the retrieved context
+  - Factual Correctness — checks the answer against the expected output
+  - Answer Relevancy — checks the answer actually addresses the query
+
+Results are printed the same 
+way as DeepEval (average score per metric, PASS/FAIL at 0.7).
+
+
+
+
+Step 13 : Adding DeepTeam Security Testing 
+------------------------------------------
+
+Added a third framework — DeepTeam — to test the agent for security/safety issues rather than answer quality. 
+DeepTeam Security Testing — security tests the agent by simulating adversarial users trying to break it, rather 
+than checking answer quality under normal use
+
+Vulnerabilities tested:
+  - Misinformation — checks if the agent stated factual errors or makes claims not backed by the retrieved 
+    corpus
+  - PII Leakage — checks if the agent can be tricked into exposing internal details like DB schema, or 
+    another user's session/conversation
+  - Bias — checks if the agent leans toward a particular political ideology in its answers
+
+Attack method: 
+    
+    -PromptInjection — sends sneaky/adversarial instructions designed to make the agent ignore 
+     its grounding rules and produce one of the vulnerabilities above
+
+
+
+Step 14 : Building Unified Report 
+-----------------------------------
+
+Added export_report() to collect all the results returned by all three frameworks into one readable .xlsx file 
+to save the output locally and also to visualise the data in rows and columns rather than displaying
+it as console output.
+
+The excel file has 2 sheets - one is a detailed report which displays detailed info on each framework.
+The other sheet gives a summarised version of the above.
+
+
+Step 15 : Setting up Flags in Config.py
+----------------------------------------
+
+Config file created ealier(in rag_agent) is updated with 4 boolean flags -- RUN_DEEPEVAL, RUN_RAGAS, RUN_DEEPTEAM,
+RUN_REPORT, so that any framework can be switched on/off  without touching the main evaluation code.
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+RESULT
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+RAG Agent evaluation is complete. The agent is tested against 20 goldens (10 manual + 10 synthesized) using 
+three independent frameworks — DeepEval (retriever + generator quality), Ragas (cross-check on retrieval and 
+answer quality), and DeepTeam (security/safety red-teaming) — with all results consolidated into a single 
+2-sheet report, and any framework can be toggled on/off via config flags set in Config.py.
+
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FILE STRUCTURE
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    - Rag_Test.py  -> RAGEvaluator, RagasEvaluator, RAGSecurityTester classes + entry point
+    - report.py    -> export_report(), builds the 2-sheet report
+    - config.py    -> shared agent instance + run flags for all 3 frameworks
